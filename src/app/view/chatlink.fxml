@@ -9,14 +9,23 @@
 
 <VBox alignment="BOTTOM_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.ChatLinkController">
    <children>
-      <WebView fx:id="showMessage" focusTraversable="false" prefHeight="300.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-      <TextArea fx:id="message" focusTraversable="false" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #FFFFFF;" VBox.vgrow="ALWAYS" />
-      <Button mnemonicParsing="false" onAction="#sendMessage" style="-fx-background-color: #F5F5F5;" text="发送(S)" VBox.vgrow="ALWAYS">
+      <WebView fx:id="showMessage" focusTraversable="false" prefHeight="300.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
          <VBox.margin>
-            <Insets bottom="5.0" right="5.0" />
-         </VBox.margin>
+            <Insets bottom="5.0" />
+         </VBox.margin></WebView>
+      <TextArea fx:id="message" focusTraversable="false" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+         <padding>
+            <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+         </padding>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin></TextArea>
+      <Button fx:id="button" mnemonicParsing="false" onAction="#sendMessage" onMouseEntered="#onMouseEnterBtn" onMouseExited="#onMouseExitBtn" style="-fx-background-color: #F5F5F5;" text="发送(S)" VBox.vgrow="ALWAYS">
          <font>
             <Font size="13.0" />
-         </font></Button>
+         </font>
+         <VBox.margin>
+            <Insets bottom="5.0" right="5.0" />
+         </VBox.margin></Button>
    </children>
 </VBox>

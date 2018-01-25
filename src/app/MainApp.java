@@ -15,10 +15,12 @@ import javafx.stage.Stage;
 import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 public class MainApp extends Application {
-
-    private Stage stage;
 
     public static void main(String[] args) {
         launch(args);
@@ -26,8 +28,7 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        this.stage = primaryStage;
-        this.stage.setTitle("chatlink");
+        primaryStage.setTitle("chatlink");
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(MainApp.class.getResource("view/chatlink.fxml"));
         try {
@@ -36,20 +37,40 @@ public class MainApp extends Application {
 
             Jedis jedis = new Jedis("127.0.0.1", 6379);
             WebEngine webEngine = webView.getEngine();
-            webEngine.loadContent(jedis.get("user"));
+
+            ServerSocket serverSocket = new ServerSocket(8918);
+            Socket socket = serverSocket.accept();
+            Reader reader = new InputStreamReader(socket.getInputStream());
+            char[] chars = new char[1024];
+            int len;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((len = reader.read(chars)) != -1) {
+                stringBuilder.append(new String(chars, 0, len));
+            }
+            reader.close();
+            socket.close();
+            serverSocket.close();
+            System.out.println("接收数据：" + stringBuilder.toString());
+
+            String myMsg = jedis.get("user");
+            String otherMsg = "<p style='padding:12 0 0 12;'><label style='background-color:#FF0000;padding:8px;font-size:14;'>" + stringBuilder.toString() + "</label></p>";
+            if(myMsg!=null){
+                webEngine.loadContent(myMsg+ otherMsg);
+            }
             jedis.close();
             webEngine.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
                 @Override
                 public void changed(ObservableValue<? extends Worker.State> observable, Worker.State oldValue, Worker.State newValue) {
-                    if(newValue== Worker.State.SUCCEEDED){
+                    if (newValue == Worker.State.SUCCEEDED) {
                         webEngine.executeScript("window.scrollTo(0,document.body.scrollHeight)");
                     }
                 }
             });
 
             Scene scene = new Scene(vBox);
-            stage.setScene(scene);
-            stage.show();
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
