@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style type="text/css">
+        .left {
+            float: left;
+            margin: 12px 0 0 12px;
+            background-color: #98E165;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .right {
+            float: right;
+            margin: 12px 12px 0 0;
+            background-color: #ff0000;
+            padding: 10px;
+            font-size: 14px;
+        }
+    </style>
+    <script type="text/javascript">
+        function addChildNode(msg,float) {
+            var divMsg = document.createElement('div');
+            divMsg.setAttribute('class', float);
+            divMsg.innerHTML = '<label>' + msg + '</label>';
+            document.body.appendChild(divMsg);
+            var div = document.createElement('div');
+            div.setAttribute('style', 'clear:both');
+            document.body.appendChild(div);
+        }
+    </script>
+</head>
+<body>
+</body>
+</html>

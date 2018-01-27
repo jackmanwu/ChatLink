@@ -1,55 +1,49 @@
 package com.jackmanwu.chatlink;
 
-import javax.websocket.EncodeException;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
+import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Created by JackManWu on 2018/1/25.
  */
-@ServerEndpoint("/msgServer")
+@ServerEndpoint(value = "/chat/{from}/{to}")
 public class ChatEndpoint {
-    private Session session;
-
-    private static Set<ChatEndpoint> chatEndpoints = new CopyOnWriteArraySet<ChatEndpoint>();
-
-    private static Map<String, String> users = new HashMap<String, String>();
+    private static final Map<String, Session> userSessionMap = new HashMap<>();
 
     @OnOpen
-    public void onOpen(Session session, @PathParam("username") String username) {
-        this.session = session;
-        chatEndpoints.add(this);
-        users.put(session.getId(), username);
-
-        Message message = new Message();
-        message.setFrom(username);
-        message.setContent("Connected!");
-        broadcast(message);
+    public void onOpen(Session session, @PathParam("from") String from) {
+        System.out.println("打开连接：" + from + "--" + session);
+        userSessionMap.put(from, session);
     }
 
     @OnMessage
-    public void onMessage(Session session, Message message) {
-        message.setFrom(users.get(session.getId()));
-        broadcast(message);
+    public void onMessage(String message, @PathParam("to") String to) {
+        System.out.println("服务器消息：" + message + "，当前用户名：" + to);
+        for (String u : userSessionMap.keySet()) {
+            System.out.println("缓存值：" + u + ">>" + userSessionMap.get(u).getId());
+        }
+        try {
+            Session session = userSessionMap.get(to);
+            System.out.println("取得session：" + session.getId());
+            session.getBasicRemote().sendText(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    private static void broadcast(Message message) {
-        chatEndpoints.forEach(endpoint -> {
-            synchronized (endpoint) {
-                try {
-                    endpoint.session.getBasicRemote().sendObject(message);
-                } catch (IOException | EncodeException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+    @OnClose
+    public void onClose(@PathParam("from") String from) {
+        System.out.println("删除session：" + from);
+        userSessionMap.remove(from);
+    }
+
+    @OnError
+    public void onError(Throwable throwable) {
+        System.out.println("报错");
+        System.out.println(throwable.getMessage());
     }
 }

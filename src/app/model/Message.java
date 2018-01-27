@@ -1,19 +1,19 @@
-package com.jackmanwu.chatlink;
+package app.model;
 
 /**
- * Created by JackManWu on 2018/1/25.
+ * Created by JackManWu on 2018/1/27.
  */
 public class Message {
-    private String from;
     private String to;
+
     private String content;
 
-    public String getFrom() {
-        return from;
+    public Message() {
     }
 
-    public void setFrom(String from) {
-        this.from = from;
+    public Message(String to, String content) {
+        this.to = to;
+        this.content = content;
     }
 
     public String getTo() {
@@ -30,10 +30,5 @@ public class Message {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    @Override
-    public String toString() {
-        return from + "--" + to + "--" + content;
     }
 }

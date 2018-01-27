@@ -1,26 +1,26 @@
 package app;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import redis.clients.jedis.Jedis;
 
+import javax.websocket.*;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.net.Socket;
+import java.net.URI;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 
 /**
  * Created by JackManWu on 2018/1/24.
  */
-public class ChatLinkController {
-    private static Socket socket;
+@ClientEndpoint
+public class ChatLinkController implements Initializable {
     @FXML
     private TextArea message;
 
@@ -30,42 +30,66 @@ public class ChatLinkController {
     @FXML
     private Button button;
 
+    private Session session;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+        URI uri = URI.create("ws://localhost:8080/chat/xiaoming/wujinlei");
+        try {
+            container.connectToServer(this, uri);
+        } catch (DeploymentException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @OnOpen
+    public void onOpen(Session session) {
+        System.out.println("会话：" + session.getId());
+        this.session = session;
+    }
+
+    @OnMessage
+    public void onMessage(Session session, String message) {
+        System.out.println("收到消息：" + message + "，session：" + session.getId());
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                WebEngine webEngine = showMessage.getEngine();
+                webEngine.load(ChatLinkController.class.getResource("templates/message.html").toString());
+                webEngine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+                    if (newValue == Worker.State.SUCCEEDED) {
+                        webEngine.executeScript("addChildNode(\'" + message + "\','left')");
+                        webEngine.executeScript("window.scrollTo(0,document.body.scrollHeight)");
+                    }
+                });
+            }
+        });
+    }
+
+    @OnClose
+    public void onClose(Session session) {
+        System.out.println("已经关闭了，session：" + session.getId());
+    }
+
     @FXML
     private void sendMessage() {
-        String key = "user";
         String msg = message.getText();
         if ("".equals(msg)) {
             return;
         }
 
+        System.out.println("当前会话：" + session);
         try {
-            if (socket == null) {
-                socket = new Socket("127.0.0.1", 8918);
-            }
-            Writer writer = new OutputStreamWriter(socket.getOutputStream());
-            writer.write(msg);
-            writer.flush();
+            session.getBasicRemote().sendText(msg);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         WebEngine webEngine = showMessage.getEngine();
-        String msgP = "<p style='padding:12 0 0 12;'><label style='background-color:#98E165;padding:8px;font-size:14;'>" + msg + "</label></p>";
-        Jedis jedis = new Jedis("127.0.0.1", 6379);
-        if (jedis.exists(key)) {
-            jedis.append(key, msgP);
-        } else {
-            jedis.set(key, msgP);
-        }
-        webEngine.loadContent(jedis.get(key));
-        jedis.close();
-
-        webEngine.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
-            @Override
-            public void changed(ObservableValue<? extends Worker.State> observable, Worker.State oldValue, Worker.State newValue) {
-                if (newValue == Worker.State.SUCCEEDED) {
-                    webEngine.executeScript("window.scrollTo(0,document.body.scrollHeight)");
-                }
+        webEngine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == Worker.State.SUCCEEDED) {
+                webEngine.executeScript("addChildNode(\'" + msg + "\','right')");
+                webEngine.executeScript("window.scrollTo(0,document.body.scrollHeight)");
             }
         });
         message.setText("");

@@ -21,7 +21,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="chatlink-server" target="1.5" />
+      <module name="chatlink-server" target="1.8" />
       <module name="chatlink-web" target="1.6" />
     </bytecodeTargetLevel>
   </component>
