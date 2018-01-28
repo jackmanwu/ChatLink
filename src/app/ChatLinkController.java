@@ -1,7 +1,6 @@
 package app;
 
 import javafx.application.Platform;
-import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -34,6 +33,8 @@ public class ChatLinkController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        WebEngine webEngine = showMessage.getEngine();
+        webEngine.load(ChatLinkController.class.getResource("templates/message.html").toString());
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         URI uri = URI.create("ws://localhost:8080/chat/xiaoming/wujinlei");
         try {
@@ -56,13 +57,8 @@ public class ChatLinkController implements Initializable {
             @Override
             public void run() {
                 WebEngine webEngine = showMessage.getEngine();
-                webEngine.load(ChatLinkController.class.getResource("templates/message.html").toString());
-                webEngine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
-                    if (newValue == Worker.State.SUCCEEDED) {
-                        webEngine.executeScript("addChildNode(\'" + message + "\','left')");
-                        webEngine.executeScript("window.scrollTo(0,document.body.scrollHeight)");
-                    }
-                });
+                webEngine.executeScript("addChildNode(\'" + message + "\','left')");
+                webEngine.executeScript("window.scrollTo(0,document.body.scrollHeight)");
             }
         });
     }
@@ -79,19 +75,22 @@ public class ChatLinkController implements Initializable {
             return;
         }
 
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                WebEngine webEngine = showMessage.getEngine();
+                webEngine.executeScript("addChildNode(\'" + msg + "\','right')");
+                webEngine.executeScript("window.scrollTo(0,document.body.scrollHeight)");
+            }
+        });
+
         System.out.println("当前会话：" + session);
         try {
             session.getBasicRemote().sendText(msg);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        WebEngine webEngine = showMessage.getEngine();
-        webEngine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == Worker.State.SUCCEEDED) {
-                webEngine.executeScript("addChildNode(\'" + msg + "\','right')");
-                webEngine.executeScript("window.scrollTo(0,document.body.scrollHeight)");
-            }
-        });
+
         message.setText("");
     }
 
