@@ -17,10 +17,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="chatlink-common" />
         <module name="chatlink-server" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="chatlink-common" target="1.5" />
       <module name="chatlink-server" target="1.8" />
       <module name="chatlink-web" target="1.6" />
     </bytecodeTargetLevel>

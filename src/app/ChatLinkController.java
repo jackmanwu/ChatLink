@@ -1,5 +1,7 @@
 package app;
 
+import com.jackmanwu.chatlink.MessageDecoder;
+import com.jackmanwu.chatlink.MessageEncoder;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -13,13 +15,14 @@ import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 
 /**
  * Created by JackManWu on 2018/1/24.
  */
-@ClientEndpoint
+@ClientEndpoint(encoders = MessageEncoder.class, decoders = MessageDecoder.class)
 public class ChatLinkController implements Initializable {
     @FXML
     private TextArea message;
@@ -37,7 +40,7 @@ public class ChatLinkController implements Initializable {
         WebEngine webEngine = showMessage.getEngine();
         webEngine.load(ChatLinkController.class.getResource("templates/message.html").toString());
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-        URI uri = URI.create("ws://localhost:8080/chat/xiaoming/wujinlei");
+        URI uri = URI.create("ws://localhost:8080/chat/wujinlei/xiaoming");
         try {
             container.connectToServer(this, uri);
         } catch (DeploymentException | IOException e) {
@@ -52,13 +55,13 @@ public class ChatLinkController implements Initializable {
     }
 
     @OnMessage
-    public void onMessage(Session session, String message) {
+    public void onMessage(Session session, List<String> list) {
         System.out.println("收到消息：" + message + "，session：" + session.getId());
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 WebEngine webEngine = showMessage.getEngine();
-                webEngine.executeScript("addChildNode(\'" + message + "\','left')");
+                list.forEach(msg -> webEngine.executeScript("addChildNode(\'" + msg + "\','left')"));
                 webEngine.executeScript("window.scrollTo(0,document.body.scrollHeight)");
             }
         });

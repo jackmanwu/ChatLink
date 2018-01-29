@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="chatlink-common-1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/chatlink-common/target/chatlink-common-1.0-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

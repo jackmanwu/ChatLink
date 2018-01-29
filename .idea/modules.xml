@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ChatLink.iml" filepath="$PROJECT_DIR$/ChatLink.iml" />
+      <module fileurl="file://$PROJECT_DIR$/chatlink-common/chatlink-common.iml" filepath="$PROJECT_DIR$/chatlink-common/chatlink-common.iml" />
       <module fileurl="file://$PROJECT_DIR$/chatlink-server/chatlink-server.iml" filepath="$PROJECT_DIR$/chatlink-server/chatlink-server.iml" />
     </modules>
   </component>

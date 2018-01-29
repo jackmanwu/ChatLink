@@ -17,7 +17,7 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("xiaoming");
+        primaryStage.setTitle("wujinlei");
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(MainApp.class.getResource("view/chatlink.fxml"));
         try {
