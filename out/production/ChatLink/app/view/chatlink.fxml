@@ -13,7 +13,7 @@
          <VBox.margin>
             <Insets bottom="5.0" />
          </VBox.margin></WebView>
-      <TextArea fx:id="message" focusTraversable="false" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+      <TextArea fx:id="message" focusTraversable="false" onKeyReleased="#EnterSendMsgEvent" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
          <padding>
             <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
          </padding>
