@@ -40,7 +40,7 @@ public class ChatLinkController implements Initializable {
         WebEngine webEngine = showMessage.getEngine();
         webEngine.load(ChatLinkController.class.getResource("templates/message.html").toString());
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-        URI uri = URI.create("ws://localhost:8080/chat/wujinlei/xiaoming");
+        URI uri = URI.create("ws://localhost:8080/chat/xiaoming/laowang");
         try {
             container.connectToServer(this, uri);
         } catch (DeploymentException | IOException e) {
